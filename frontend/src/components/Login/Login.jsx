@@ -3,60 +3,70 @@ import {
   Logo,
   Form,
   Input,
-  SignUpLink,
   Button,
   ErrorMessage,
-} from "./Login.styles";
-import instagram from "../../assets/images/instagram-logo.png";
-import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+  SignUpLink,
+} from './Login.styles';
+import instagram from '../../assets/images/instagram-logo.png';
+import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import axios from 'axios';
+import { axiosInstance, setAuthToken } from '../../apiConfig';
 
 const Login = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ username: "", password: "" });
-  const [error, setError] = useState("");
+  const [formData, setFormData] = useState({ username: '', password: '' });
+  const [error, setError] = useState('');
 
   const handleChange = (e, key) => {
     let obj = { ...formData, [key]: e.target.value };
-    setFormData({ obj });
+    setFormData(obj);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const unFilledFields = Object.keys(formData).filter(
       (key) => !formData[key]
     );
     if (unFilledFields.length) {
-      setError(`${unFilledFields.join(" or ")} is required`);
+      setError(`${unFilledFields.join(' or ')} is required`);
       return;
     }
-    navigate('/home');
+    try {
+      const url = 'http://localhost:8000/api/auth/login';
+      const response = await axios.post(url, formData);
+      console.log(response.data);
+      setAuthToken(response.data.token);
+      setFormData({ username: '', password: '' });
+      navigate('/home');
+    } catch (error) {
+      console.error('error logging in:', error.response.data);
+      setError(error.response.data.message);
+    }
   };
 
   return (
     <Container>
-      <Logo src={instagram}></Logo>
-      <Form>
+      <Logo src={instagram} alt='Instagram'></Logo>
+      <Form onSubmit={handleSubmit}>
         <Input
-          type="text"
-          placeholder="Username"
+          type='text'
+          placeholder='Username'
           value={formData.username}
-          onChange={(e) => handleChange(e, "username")}
+          onChange={(e) => handleChange(e, 'username')}
         ></Input>
         <Input
-          type="password"
-          placeholder="Password"
+          type='password'
+          placeholder='Password'
           value={formData.password}
-          onChange={(e) => handleChange(e, "password")}
+          onChange={(e) => handleChange(e, 'password')}
         ></Input>
-        <Button type="submit" onClick={handleSubmit}>
-          Sign In
-        </Button>
+        <Button type='submit'>Sign In</Button>
       </Form>
       {error && <ErrorMessage>{error}</ErrorMessage>}
 
       <SignUpLink>
-        Do not have an account?<Link to="/register">Sign up</Link>
+        Do not have an account?<Link to='/register'>Sign up</Link>
       </SignUpLink>
     </Container>
   );

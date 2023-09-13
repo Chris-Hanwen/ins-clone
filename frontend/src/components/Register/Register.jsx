@@ -6,10 +6,12 @@ import {
   Button,
   SignUpLink,
   ErrorMessage,
-} from "./Register.styles";
-import instagram from "../../assets/images/instagram-logo.png";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+} from './Register.styles';
+import instagram from '../../assets/images/instagram-logo.png';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+
 
 const Register = () => {
   const navigate = useNavigate();
@@ -18,13 +20,13 @@ const Register = () => {
   //   const [username, setUsername] = useState("");
   //   const [password, setPassword] = useState("");
   const [formData, setFormData] = useState({
-    fullname: "",
-    email: "",
-    username: "",
-    password: "",
+    fullName: '',
+    email: '',
+    username: '',
+    password: '',
   });
 
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const handleChange = (e, key) => {
     let obj = { ...formData, [key]: e.target.value };
@@ -32,52 +34,62 @@ const Register = () => {
     console.log(e.target.value);
   };
 
-  const handleSubmit = (e) => { 
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("formData", formData);
+    console.log('formData', formData);
     const unFilledFields = Object.keys(formData).filter(
       (key) => !formData[key]
     );
     if (unFilledFields.length > 0) {
-      setError(`${unFilledFields.join(" ")} are required`);
+      setError(`${unFilledFields.join(' ')} are required`);
       return;
     }
-    navigate("/home");
+    try {
+      const url = 'http://localhost:8000/api/auth/register';
+      const response = await axios.post(url, formData);
+      console.log(response.data);
+      
+      setFormData({ fullName: '', email: '', username: '', password: '' });
+      navigate('/home');
+    } catch (error) {
+      console.error('error registering user:', error.response.data);
+      setError('an error occurred');
+    }
   };
   return (
     <Container>
-      <Logo src={instagram} alt="instagram" />
+      <Logo src={instagram} alt='instagram' />
       <Form onSubmit={handleSubmit}>
         <Input
-          type="text"
-          placeholder="Full Name"
-          value={formData.fullname}
-          onChange={(e) => handleChange(e, "fullname")}
+          type='text'
+          placeholder='Full Name'
+          value={formData.fullName}
+          onChange={(e) => handleChange(e, 'fullName')}
         />
         <Input
-          type="text"
-          placeholder="Mobile Number or Email"
+          type='text'
+          placeholder='Mobile Number or Email'
           value={formData.email}
-          onChange={(e) => handleChange(e, "email")}
+          onChange={(e) => handleChange(e, 'email')}
         />
         <Input
-          type="text"
-          placeholder="Username"
+          type='text'
+          placeholder='Username'
           value={formData.username}
-          onChange={(e) => handleChange(e, "username")}
+          onChange={(e) => handleChange(e, 'username')}
         />
         <Input
-          type="text"
-          placeholder="Password"
+          type='password'
+          placeholder='Password'
           value={formData.password}
-          onChange={(e) => handleChange(e, "password")}
+          onChange={(e) => handleChange(e, 'password')}
         />
-        <Button type="submit" >Sign Up</Button>
+        <Button type='submit'>Sign Up</Button>
       </Form>
       {error && <ErrorMessage>{error}</ErrorMessage>}
 
       <SignUpLink>
-        Already have an account?<Link to="/login">Login in</Link>
+        Already have an account?<Link to='/login'>Login in</Link>
       </SignUpLink>
     </Container>
   );
