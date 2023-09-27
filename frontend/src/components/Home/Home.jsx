@@ -1,5 +1,11 @@
-const Home = ()=>{
-    return <div>Welcome to home page</div>
-}
+import Navbar from '../Navbar/Navbar';
 
-export default Home
+const Home = () => {
+  return (
+    <div>
+      <Navbar />
+    </div>
+  );
+};
+
+export default Home;
