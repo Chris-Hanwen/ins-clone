@@ -8,7 +8,7 @@ import {
 } from './Profile.styles';
 import { axiosInstance } from '../../apiConfig';
 
-const CreateProfile = ({ userID }) => {
+const CreateProfile = ({ userID, setIsProfileCreated }) => {
   const [formData, setFormData] = useState({
     name: '',
     category: '',
@@ -49,6 +49,7 @@ const CreateProfile = ({ userID }) => {
         formDataToSubmit,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );
+      setIsProfileCreated(true)
       console.log(response.data);
     } catch (error) {
       console.error('Error uploading profile', error);

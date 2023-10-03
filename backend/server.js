@@ -4,6 +4,7 @@ const fileUpload = require('express-fileupload');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const profileRoutes = require('./routes/profileRoutes');
+const postRoutes = require('./routes/postRoutes')
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -13,6 +14,7 @@ const PORT = 8000;
 
 app.use('/api/auth', authRoutes);
 app.use('/api/profiles', profileRoutes);
+app.use('/api/posts',postRoutes)
 
 connectDB().then(
   app.listen(PORT, () => {
