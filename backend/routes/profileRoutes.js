@@ -1,4 +1,5 @@
 const express = require('express');
+const authenticationToken = require('../middlewares/authMiddleware')
 
 const {
   createProfile,
@@ -9,7 +10,7 @@ const {
 
 const router = express.Router();
 
-router.post('/', createProfile);
+router.post('/', authenticationToken,createProfile);
 router.get('/:userID', getUserProfile);
 router.get('/', getAllProfiles);
 router.get('/image/:userID', getProfileImage);

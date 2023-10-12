@@ -2,15 +2,16 @@
 import { useParams } from 'react-router-dom';
 import { InfoContainer, Info, Stats, Bio, LoadIcon } from './Profile.styles';
 
-import { initialState as postData } from '../../Redux/PostData';
 import CheckCircle from '@mui/icons-material/CheckCircle';
 import { useEffect, useState } from 'react';
 import CreateProfile from './CreateProfile';
 import axios from 'axios';
+import { useSelector } from 'react-redux/es/hooks/useSelector';
 
 const ProfileInfo = () => {
   const { id } = useParams();
   console.log(id);
+  const postData = useSelector((state) => state.post.postData);
   let filteredPosts = postData.filter((post) => {
     return post.userID === id;
   });
@@ -38,7 +39,10 @@ const ProfileInfo = () => {
     <>
       {profile ? (
         <InfoContainer>
-          <img src={`http://localhost:8000/api/profiles/image/${profile.userID}`} alt='profile picture' />
+          <img
+            src={`http://localhost:8000/api/profiles/image/${profile.userID}`}
+            alt='profile picture'
+          />
           <Info>
             <p className='owner-ID'>
               {profile.userID}

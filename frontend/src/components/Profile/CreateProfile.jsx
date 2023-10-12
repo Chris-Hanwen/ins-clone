@@ -7,8 +7,11 @@ import {
   ErrMessage,
 } from './Profile.styles';
 import { axiosInstance } from '../../apiConfig';
+import {saveProfileData} from '../../Redux/ProfileData'
+import {useDispatch} from 'react-redux'
 
 const CreateProfile = ({ userID, setIsProfileCreated }) => {
+  const dispatch = useDispatch()
   const [formData, setFormData] = useState({
     name: '',
     category: '',
@@ -49,8 +52,11 @@ const CreateProfile = ({ userID, setIsProfileCreated }) => {
         formDataToSubmit,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );
+      const updatedProfiles = await axiosInstance.get('/api/profiles')
+      dispatch(saveProfileData(updatedProfiles.data))
       setIsProfileCreated(true)
       console.log(response.data);
+        
     } catch (error) {
       console.error('Error uploading profile', error);
     }

@@ -9,7 +9,7 @@ const getAllPosts = (req, res) => {
       }
       return res.status(200).json(posts);
     })
-    .catch((err) => {
+    .catch((error) => {
       console.error('Error fetching posts:', error);
       return res.status(500).json({ message: 'Internal server error' });
     });
@@ -40,17 +40,65 @@ const createPost = async (req, res) => {
       likes,
       isLiked,
       caption,
-      comments,
+      comments: JSON.parse(comments),
       postID,
     });
     //save the new post document to the db
+    console.log('newPost:', newPost);
     await newPost.save();
+
     res
       .status(201)
-      .json({ message: 'Post created sucessfully', post: newPost });
+      .json({ message: 'Post created successfully', post: newPost });
   } catch (error) {
     console.error('Error creating posts:', error);
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
-module.exports = { getAllPosts, createPost };
+
+const getPostImage = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const post = await Post.findById(id);
+    if (!post || !post.postLink) {
+      return res.status(404).json({ message: 'Image not found' });
+    }
+    res.contentType('image/png');
+    res.send(post.postLink);
+  } catch (error) {
+    console.error('Error serving image:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+const updatedPosts = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { likes, isLiked, comments } = req.body;
+    //convert id to
+    const postObjectId = new mongoose.Types.ObjectId(id);
+    const updatedFields = {};
+    if (likes !== undefined) {
+      updatedFields.likes = likes;
+    }
+    if (comments !== undefined) {
+      updatedFields.comments = comments;
+    }
+    if (isLiked !== undefined) {
+      updatedFields.isLiked = isLiked;
+    }
+    const updatedPost = await Post.findOneAndUpdate(
+      { _id: postObjectId },
+      { $set: updatedFields },
+      { new: true }
+    );
+    if (!updatedPost) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+    res.json(updatedPost);
+  } catch (error) {
+    console.error('Error updating post data:', error);
+  }
+};
+
+module.exports = { getAllPosts, createPost, getPostImage, updatedPosts };
